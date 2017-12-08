@@ -1,0 +1,41 @@
+version: '2'
+services:
+
+    ubuntu:
+        image: ubuntu-minion:1
+        hostname: ubuntu-minion
+        build:
+            context: ./ubuntu-minion
+            dockerfile: Dockerfile
+        networks:
+            saltstack:
+              ipv4_address: 10.2.1.2
+        tty: true
+    centos-master:
+        image: centos-master:1
+        hostname: centos-master
+        build:
+            context: ./centos-master
+            dockerfile: Dockerfile
+        networks:
+            saltstack:
+              ipv4_address: 10.2.1.3
+        tty: true
+    centos-minion:
+        image: centos-master:1
+        hostname: centos-minion
+        depends_on:
+          - centos-master
+        networks:
+          saltstack:
+            ipv4_address: 10.2.1.4
+        tty: true
+
+networks:
+    saltstack:
+        driver: bridge
+        ipam:
+            driver: default
+            config:
+                - subnet: 10.2.1.0/24
+                  gateway: 10.2.1.1
